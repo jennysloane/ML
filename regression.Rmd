@@ -24,55 +24,92 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janitor)
 library(car)
+library(mlbench)
 
 theme_set(theme_bw())
 ```
 
 # simple linear regression
+- Boston Housing dataset 
+- first, let's look at relationships between different variables
 ```{r}
-data(longley) 
+data(BostonHousing)
+?BostonHousing
 
-?longley
+boston <- BostonHousing %>%
+  as_tibble() 
 
-longley <- longley %>%
-  as_tibble() %>%
-  clean_names()
-  
-ggplot(longley, aes(gnp, employed)) +
+pairs(boston, pch=19, lower.panel = NULL)
+```
+
+- pretty clear relationship between rm (avg number of rooms per dwelling) and medv (median value of owner-occupied homes)
+
+- dis (distance to 5 employment centers) and nox (nitric oxides concentration) perhaps quadratic relationship??
+  - this seems more interesting so let's look at this 
+  - also good exercise because a lot of times our data won't be linear
+```{r}
+ggplot(boston, aes(dis, nox)) +
   geom_point() +
-  geom_smooth(method = "lm", se=FALSE) +
-  xlim(0, 700) +
-  ylim(50,75)
+  geom_smooth(method = "lm", se = FALSE) # not surprising, but not a very good fit 
 
-m1 <- lm(gnp ~ employed, data=longley)
+m1 <- lm(dis ~ nox, data=boston)
 m1
 summary(m1)
 
 names(m1)
 m1$coefficients # or coef(m1)
 
-predict(m1, data.frame(employed=c(50,55,80)),
-        interval="confidence")
+predict(m1, data.frame(nox=c(.3,.5)),
+        interval="confidence") 
 
+```
+
+# check assumptions: what to look for in each?
+- plot 1: residuals and fitted values (want to see a straight line?)
+- plot 2: normal QQ
+- plot 3: scale location
+- plot 4: residuals vs leverage
+```{r}
 plot(m1)
 
-which.max(hatvalues(m1)) # which observation has the largest leverage 
+which.max(hatvalues(m1)) # which observation has the largest leverage
+# what about 354? is that just an outlier?
 ```
 
 # multiple linear regression
 ```{r}
-m2 <- lm(gnp ~ employed + year, data=longley)
+m2 <- lm(dis ~ ., data=boston) # all predictors
 summary(m2)
 
-m3 <- lm(gnp ~ ., data=longley) # all predictors
-summary(m3)
+summary(m2)$r.sq
 
-summary(m3)$r.sq
+vif(m2) # help determine if predictors are too highly correlated
+# some numbers are large what to do next? try to remove collinearity?
 
-vif(m3) # why are numbers so high? collinearity? 
+m3 <- lm(dis ~ . - tax - lstat, data=boston) # not sure which variables to remove? systematic way to do this?
+vif(m3) 
+```
 
-m4 <- lm(gnp ~ . - gnp_deflator - unemployed, data=longley) # all predictors
-vif(m4) # still high
+# non linear transformation
+- when transforming predictors so it's ^2, you need to wrap it in `I()` because ^ has a special meaning in a formula 
+- the fact that the transformed predictor (quadratic term) is significant, near 0, suggests it leads to an improved model
+- can do anova() to quantify the extent to which the quadratic fit is superior to the linear fit
+- can use the poly() to test multiple polynomial terms at once
+```{r}
+m4 = lm(dis ~ nox + nox^2, data=boston)
+summary(m4)
+
+m5 = lm(dis ~ nox + I(nox^2), data=boston)
+summary(m5)
+
+anova(m1, m5)
+
+plot(m5)
+
+# what about ^3? or ^4
+m6 = lm(dis ~ poly(nox,5), data=boston)
+summary(m6)
+
 ```
 
 
