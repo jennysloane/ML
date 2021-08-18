@@ -1,0 +1,151 @@
+---
+title: "Statistical Learning Notes"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+<!-- ctrl + shift + k to preview in viewer -->
+
+
+*Most of these notes are from: An Introduction to Statistical Learning with Applications in R by Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani plus some additional notes from Learning Statistics with R by Danielle Navarro* 
+
+## Chapter 1: Introduction
+- **supervised statistical learning** = building a statistical model for predicting or estimating an output based on one or more inputs
+- **unsupervised statistical learning** = there are inputs, but NO outputs. we lack a response variable that can supervise our analysis
+- *semi-supervised learning* = some of the observations have both predictor measurements and a response measurement, but the rest of the observations only have a predictor measurement 
+- continuous or quantitative output (numerical values) = **regression problem**
+- categorical output = **classification problem** 
+- generalized linear models (GLMs) = entire class of statistical learning methods including linear and logistic regression as special cases
+- generalized additive models = class of non-linear extensions to GLMs
+
+## Chapter 2: Statistical Learning
+- statistical learning = set of approaches for estimating *f*
+- 2 main reasons to estimate *f*: prediction and inference
+- accuracy of the estimate of *f* depends on reducible and irreducible error
+  - **reducible error** = ability to improve the accuracy of *f* by finding the most appropriate statistical model
+  - **irreducible error** = there is always some error that will remain ($\epsilon$), no matter how well you estimate *f* 
+- the aim here is to learn about techniques to estimate *f* by minimizing the reducible error 
+
+### parametric methods
+- reducing the problem of estimating *f* down to one of estimating a set of parameters 
+- disadvantage: the model we choose will usually not match the true unknown of *f*
+- to try to address this problem, we can choose a more flexible model, but that requires estimating a greater number of parameters and can lead to overfitting (fits errors/noise too closely)
+
+### non-parametric methods
+- do not make explicit assumptions about the functional form of *f*, but rather estimate *f* get as close to the data points as possible without being too rough or wiggly
+- disadvantage: requires a very large number of observations
+- example: thin-plate spline where you have to specify the level of smoothness
+- tradeoff between flexibility and interpretability 
+  - in general, as the flexibility of a method increases, its interpretability decreases 
+  
+### regression vs. classification
+- **regression** = problems with quantitative responses (example: least squares linear regression)
+- **classification** = problems with qualitative responses (example: logistic regression)
+
+### assessing model accuracy
+- **mean squared error (MSE)** = most commonly used measure for regression models to evaluate the performance of the statistical model
+- training MSE = computed using training data that that was used to fit the model 
+- but we are really interested in the accuracy of the predictions in test data (previously unseen)
+- we want to choose the method that produces the lowest test MSE 
+- as flexibility of the statistical learning method increases, we see a monotone decrease in the training MSE and a U-shape in the test MSE 
+
+### bias-variance tradeoff
+- **in order to minimize expected test error, we need a statistical learning method that achieves BOTH low variance and low bias**
+- **variance** = the amount by which estimated *f* would change if we estimated using a different training data set
+- **bias** = error that is introduced by approximating a real-life problem 
+- general rule, as flexibility increases, the variance will increase and the bias will decrease 
+- for classification, a good classifier is one where the test error is smallest (examples: Bayes Classifier, K-Nearest Neighbors)
+  
+##  Chapter 3: Linear Regression  
+- useful tool for predicting a quantitative response
+- linear regressions are "fancier" versions of Pearson correlation...but more powerful
+- y = mx + c
+- y = b1Xi + b0 + e 
+- estimated regression coefficients minimize the sum of the squared residuals, also known as "line of best fit"
+- Pearson correlation is equivalent to a linear regression with one predictor
+
+### simple linear regression - a single predictor variable 
+- while the true relationship is usually not known, least squares line can always be computed using the coefficient estimates 
+- **RSE** = considered a measure of the lack of fit of the model to the data
+- **R^2^** = an alternative measure of fit that is the proportion of variance explained and has an interpretional advantage over the RSE
+
+### multiple linear regression - more than 1 predictor
+- R^2^ will always increase when more variables are added to the model, but if adding a variable to the model only increases R^2^ by a tiny amount, you have more evidence that the variable can be dropped 
+- confidence interval to quantify uncertainty surrounding the average over a large number of cities for example
+- prediction interval to quantify uncertainty surrounding a particular city 
+
+### Other considerations in regression models
+- if a qualitative predictor (factor) has levels, you can create a dummy variable(s) where one category is arbitrarily chosen as the baseline factor and the other variables are compared to it. Can check the p values to see if there's a significant difference between the groups
+- the relationship between the predictors and response are additive and linear
+  - additive: the effect of changes in a predictor X on the response Y is independent of the values of the other predictors
+  - linear: the change in the response Y due to a 1 unit change in X is constant 
+- interaction effect also known as synergy effect in marketing: can easily add an interaction term by computing the product of X~1~ and X~2~
+- **hierarchical principle** = if you include an interaction in a model, you should also include the main effects regardless of the p values
+- models that have different intercepts but same slopes = parallel lines
+- models that have different intercepts and different slopes = can have an interaction
+- **polynomial regression** = accommodate non-linear relationships
+- one way to include non-linear associations to a linear model is to include transformed versions of the predictors
+  - example: 'horsepower' and 'horsepower^2^'
+  - but this is still a linear model!
+
+### potential problems when fitting a linear regression model
+  
+  - `car` package in R is useful for regression diagnostics 
+
+  1. **non-linearity of the response-predictor** relationships
+  - **residual plots** = useful graphical tool for identifying non-linearity
+  - plot the residual vs predicted/fitted values and ideally there will be no discernible pattern. If there's a clear U-shape or other noticeable shape, that indicates non-linearity in the data 
+  - if there's a clear pattern, use a transformation and then try to plot the residuals vs fitted values and hopefully there will little to no pattern
+  
+  2. **correlation of error terms**
+  - important assumption: error terms are uncorrelated
+  - if correlated, estimated se will tend to underestimate the true se giving us an unwarranted sense of confidence in our model
+  - frequently occur in time series data
+  
+  3. **non-constant variance of error terms**
+  - another assumption: error terms have a constant variance or residuals are normally distributed
+  - can identify this heteroscedasticity if you see a funnel shape in the residual plot (residual x fitted)
+  - one possible solution: transform response Y for example, logY or sqrt(Y)
+  - if this assumption is violated, the standard error estimates are also no longer all that reliable so t tests for the coefficients aren't exactly right
+  
+  4. **outliers**
+  - observations for which the response y is unusual given x
+  - to test for outliers, you can plot the studentized residuals x fitted values and would expect to see values between -3 and 3 
+  
+  5. **high leverage points**
+  - unusual value of x 
+  - removing high leverage points can have a much greater impact on the least squares line 
+  - to quantify an observation's leverage, you can compute the *leverage statistic* 
+  
+  6. **influence**
+  - a high influence observation is an outlier + high leverage
+  - use Cook's distance to operationalise (> 1 often considered large)
+  
+  7. **collinearity** 
+  - refers to the situation in which two or more predictor variables are closely related to one another
+  - contouor plots can help visualize collinearity 
+  - also, a correlation matrix can help detect collinearity - an element of the matrix that is large in absolute value indicates a pair of highly correlated variables
+  - VIFs (varaince inflation factors) can also help determine if predictors are too highly correlated: `vif()` in car package
+  - **multicollinearity** = collinearity to exist between 3 or more variables even if no pair of variables has a particularly high correlation 
+  - variance inflation factor = good way to assess multicollinearity (VIF that exceeds 5 or 10 is problematic)
+  - two solutions for dealing with collinearity:
+    - drop one of the problematic variables from the regression
+    - combine the collinear variables together into a single predictor (example: `limit` and `rating` are collinear, create a new variable `credit worthiness` that accounts for both)
+    
+### Comparison of linear regression with K-nearest neighbors
+
+- linear regression is an example of a parametric approach because it assumes a linear functional form for f(X)
+- non-parametric methods do not assume a parametric form of f(X) and therefore provide a more flexible approach for performing regression 
+- one of the most common methods: K-nearest neighbors regression (KNN regression)
+- optimal value for K will depend on the bias-variance trade-off 
+- the parametric approach will outperform the non-parametric approach if the parametric form that has been selected is close to the true form of f
+- parametric approach will also be better when there is a small number of observations per predictor
+  
+
+
+
+
+  
+  
+  
+  

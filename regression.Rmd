@@ -1,0 +1,78 @@
+---
+title: "regression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Questions I had before/during reading:
+- what is the difference between correlation and linear regression? when should you use one vs the other?
+- is mean centering the same as standardizing coefficients? when should you do either?
+- what are people's opinions of R^2 vs adjusted R^2?    
+  - R^2 is more interpretable whereas adjusted accounts for bias 
+- are some assumptions more important than others? do people actually check the assumptions?
+- what does is mean to say "residuals that are independent of each other"?
+- what are the different types of residuals? regular vs standadised vs studentised?
+- what is an ideal workflow for checking your model and all the assumptions?
+- what to do when specific assumptions are violated?
+
+- [datasets in R](https://machinelearningmastery.com/machine-learning-datasets-in-r/)
+- we'll use: Longley’s Economic Regression Data
+```{r}
+library(tidyverse)
+library(janitor)
+library(car)
+
+theme_set(theme_bw())
+```
+
+# simple linear regression
+```{r}
+data(longley) 
+
+?longley
+
+longley <- longley %>%
+  as_tibble() %>%
+  clean_names()
+  
+ggplot(longley, aes(gnp, employed)) +
+  geom_point() +
+  geom_smooth(method = "lm", se=FALSE) +
+  xlim(0, 700) +
+  ylim(50,75)
+
+m1 <- lm(gnp ~ employed, data=longley)
+m1
+summary(m1)
+
+names(m1)
+m1$coefficients # or coef(m1)
+
+predict(m1, data.frame(employed=c(50,55,80)),
+        interval="confidence")
+
+plot(m1)
+
+which.max(hatvalues(m1)) # which observation has the largest leverage 
+```
+
+# multiple linear regression
+```{r}
+m2 <- lm(gnp ~ employed + year, data=longley)
+summary(m2)
+
+m3 <- lm(gnp ~ ., data=longley) # all predictors
+summary(m3)
+
+summary(m3)$r.sq
+
+vif(m3) # why are numbers so high? collinearity? 
+
+m4 <- lm(gnp ~ . - gnp_deflator - unemployed, data=longley) # all predictors
+vif(m4) # still high
+```
+
+
