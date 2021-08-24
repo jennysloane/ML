@@ -1,7 +1,9 @@
 ---
 title: "Statistical Learning Notes"
-output: html_notebook
-editor_options: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: inline
 ---
 <!-- ctrl + shift + k to preview in viewer -->
@@ -55,6 +57,10 @@ editor_options:
 - **bias** = error that is introduced by approximating a real-life problem 
 - general rule, as flexibility increases, the variance will increase and the bias will decrease 
 - for classification, a good classifier is one where the test error is smallest (examples: Bayes Classifier, K-Nearest Neighbors)
+- [Understanding the Bias-Variance Tradeoff](https://towardsdatascience.com/understanding-the-bias-variance-tradeoff-165e6942b229) <br>
+![](images/bias_variance_bullseye.png) 
+![](images/bias_variance.png)
+  
   
 ##  Chapter 3: Linear Regression  
 - useful tool for predicting a quantitative response

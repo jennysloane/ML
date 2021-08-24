@@ -4,27 +4,42 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 ```
 
 # Questions I had before/during reading:
-- what is the difference between correlation and linear regression? when should you use one vs the other?
-- is mean centering the same as standardizing coefficients? when should you do either?
-- what are people's opinions of R^2 vs adjusted R^2?    
-  - R^2 is more interpretable whereas adjusted accounts for bias 
-- are some assumptions more important than others? do people actually check the assumptions?
-- what does is mean to say "residuals that are independent of each other"?
-- what are the different types of residuals? regular vs standadised vs studentised?
-- what is an ideal workflow for checking your model and all the assumptions?
-- what to do when specific assumptions are violated?
+
+1. What is the difference between correlation and linear regression? when should you use one vs the other?
+    - pearson correlation is equivalent to a linear regression with 1 predictor
+    - linear regression can have multiple predictors 
+2. Is mean centering the same as standardizing coefficients? when should you do either?
+  - standardizing - subtracting the mean of the variable and dividing by sd. helps with the interpretation of the estimated coefficients
+  - centering - just subtracting the mean. helps with the interpretation of the estimated constant 
+3. what are people's opinions of $R^{2}$ vs adjusted $R^{2}$?    
+  - $R^{2}$ is more interpretable whereas adjusted accounts for bias 
+  - In her book, Dani says she prefers $R^{2}$
+4. Are some assumptions more important than others? do people actually check the assumptions?
+  - assumptions: linearity, homoscedasticity (variance of residuals is the same for any value of x), independence (observations are independent of each other), normality
+  - ??
+5. What does is mean to say "residuals that are independent of each other"?
+  - ??
+6. What are the different types of residuals? 
+  - regular vs standardised vs studentised
+  - ??
+7. What is an ideal workflow for checking your model and all the assumptions?
+  - go through example below
+8. What to do when specific assumptions are violated?
+  - if data is non-linear, can try a transformation and check residual vs predicted/fitted values to see if that helped
+    - what are some common transformations? $var^{2}$ or log()
+  - if collinearity, drop one of the problematic variables or combine variables into a single predictor
 
 - [datasets in R](https://machinelearningmastery.com/machine-learning-datasets-in-r/)
-- we'll use: Longley’s Economic Regression Data
 ```{r}
 library(tidyverse)
 library(janitor)
 library(car)
 library(mlbench)
+library(broom)
 
 theme_set(theme_bw())
 ```
@@ -34,7 +49,7 @@ theme_set(theme_bw())
 - first, let's look at relationships between different variables
 ```{r}
 data(BostonHousing)
-?BostonHousing
+# ?BostonHousing
 
 boston <- BostonHousing %>%
   as_tibble() 
@@ -55,6 +70,8 @@ ggplot(boston, aes(dis, nox)) +
 m1 <- lm(dis ~ nox, data=boston)
 m1
 summary(m1)
+tidy(m1)
+glance(m1)
 
 names(m1)
 m1$coefficients # or coef(m1)
