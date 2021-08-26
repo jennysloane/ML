@@ -231,6 +231,7 @@ pre code {
 library(janitor)
 library(car)
 library(mlbench)
+library(broom)
 
 theme_set(theme_bw())</code></pre>
 </div>
@@ -288,6 +289,18 @@ m1</code></pre>
 ## Residual standard error: 1.347 on 504 degrees of freedom
 ## Multiple R-squared:  0.5917, Adjusted R-squared:  0.5909 
 ## F-statistic: 730.4 on 1 and 504 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>tidy(m1)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   term        estimate std.error statistic   p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)     11.5     0.293      39.4 5.00e-156
+## 2 nox            -14.0     0.517     -27.0 4.23e-100</code></pre>
+<pre class="r"><code>glance(m1)</code></pre>
+<pre><code>## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     0.592         0.591  1.35      730. 4.23e-100     1  -868. 1741. 1754.
+## # ... with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
 <pre class="r"><code>names(m1)</code></pre>
 <pre><code>##  [1] &quot;coefficients&quot;  &quot;residuals&quot;     &quot;effects&quot;       &quot;rank&quot;         
 ##  [5] &quot;fitted.values&quot; &quot;assign&quot;        &quot;qr&quot;            &quot;df.residual&quot;  

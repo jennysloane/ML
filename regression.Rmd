@@ -13,8 +13,8 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
     - pearson correlation is equivalent to a linear regression with 1 predictor
     - linear regression can have multiple predictors 
 2. Is mean centering the same as standardizing coefficients? when should you do either?
-  - standardizing - subtracting the mean of the variable and dividing by sd. helps with the interpretation of the estimated coefficients
-  - centering - just subtracting the mean. helps with the interpretation of the estimated constant 
+  - standardizing - subtracting the mean of the variable and dividing by sd. helps with the interpretation of the estimated coefficients. puts predictors on the same scale to make them easier to compare
+  - centering - just subtracting the mean. helps with the interpretation of the estimated constant/intercept 
 3. what are people's opinions of $R^{2}$ vs adjusted $R^{2}$?    
   - $R^{2}$ is more interpretable whereas adjusted accounts for bias 
   - In her book, Dani says she prefers $R^{2}$
@@ -62,6 +62,8 @@ pairs(boston, pch=19, lower.panel = NULL)
 - dis (distance to 5 employment centers) and nox (nitric oxides concentration) perhaps quadratic relationship??
   - this seems more interesting so let's look at this 
   - also good exercise because a lot of times our data won't be linear
+  
+- monotonically decreasing. exponential probably better than quadratric  
 ```{r}
 ggplot(boston, aes(dis, nox)) +
   geom_point() +
@@ -74,12 +76,24 @@ tidy(m1)
 glance(m1)
 
 names(m1)
+
 m1$coefficients # or coef(m1)
 
-predict(m1, data.frame(nox=c(.3,.5)),
+
+predict(m1, data.frame(nox=c(.3)),
         interval="confidence") 
 
 ```
+
+- predict function: what's it actually doing? what is fit? why does it only accept y var?
+- y = mx + c
+- using our model:
+  - y = -13.98*0.3 + 11.55 
+  - y = 7.36
+- predict() also returns 7.36
+- but when we look at our geom_smooth plot, it looks like nox = 0.3 should be dis = ~10 (just under). why?
+
+# THIS IS WHERE WE'LL PICK UP NEXT WEEK :) 
 
 # check assumptions: what to look for in each?
 - plot 1: residuals and fitted values (want to see a straight line?)
