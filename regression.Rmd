@@ -13,15 +13,17 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
     - pearson correlation is equivalent to a linear regression with 1 predictor
     - linear regression can have multiple predictors 
 2. Is mean centering the same as standardizing coefficients? when should you do either?
-  - standardizing - subtracting the mean of the variable and dividing by sd. helps with the interpretation of the estimated coefficients. puts predictors on the same scale to make them easier to compare
-  - centering - just subtracting the mean. helps with the interpretation of the estimated constant/intercept 
+  - standardizing - subtracting the mean of the variable and dividing by sd. helps with the interpretation of the estimated coefficients
+  - centering - just subtracting the mean. helps with the interpretation of the estimated constant 
 3. what are people's opinions of $R^{2}$ vs adjusted $R^{2}$?    
   - $R^{2}$ is more interpretable whereas adjusted accounts for bias 
   - In her book, Dani says she prefers $R^{2}$
 4. Are some assumptions more important than others? do people actually check the assumptions?
   - assumptions: linearity, homoscedasticity (variance of residuals is the same for any value of x), independence (observations are independent of each other), normality
+  - SXL: Re: whether people do check assumptions, I'm sure some do but I don't remember seeing it reported very often!
   - ??
 5. What does is mean to say "residuals that are independent of each other"?
+  - SXL: I think this means that the residuals can be treated as independent samples (i.e., the probability of getting one value should not affect the probability of getting another)...?  
   - ??
 6. What are the different types of residuals? 
   - regular vs standardised vs studentised
