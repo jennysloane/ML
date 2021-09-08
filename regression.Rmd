@@ -7,7 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 ```
 
-# Questions I had before/during reading:
+## Questions I had before/during reading:
 
 1. What is the difference between correlation and linear regression? when should you use one vs the other?
     - pearson correlation is equivalent to a linear regression with 1 predictor
@@ -46,7 +46,7 @@ library(broom)
 theme_set(theme_bw())
 ```
 
-# simple linear regression
+## simple linear regression
 - Boston Housing dataset 
 - first, let's look at relationships between different variables
 ```{r}
@@ -71,7 +71,7 @@ ggplot(boston, aes(dis, nox)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) # not surprising, but not a very good fit 
 
-m1 <- lm(dis ~ nox, data=boston)
+m1 <- lm(nox ~ dis, data=boston)
 m1
 summary(m1)
 tidy(m1)
@@ -82,34 +82,88 @@ names(m1)
 m1$coefficients # or coef(m1)
 
 
-predict(m1, data.frame(nox=c(.3)),
+predict(m1, data.frame(dis=c(6)),
         interval="confidence") 
 
 ```
 
-- predict function: what's it actually doing? what is fit? why does it only accept y var?
+- predict function
 - y = mx + c
 - using our model:
-  - y = -13.98*0.3 + 11.55 
-  - y = 7.36
-- predict() also returns 7.36
-- but when we look at our geom_smooth plot, it looks like nox = 0.3 should be dis = ~10 (just under). why?
+  - y = -0.042*6 + 0.715 
+  - y = 0.463
+- predict()  returns 0.461
 
-# THIS IS WHERE WE'LL PICK UP NEXT WEEK :) 
+## check assumptions: what to look for in each?
+*Most of these notes including the outliers images are taken from Danielle's book Chapter 15*
 
-# check assumptions: what to look for in each?
-- plot 1: residuals and fitted values (want to see a straight line?)
-- plot 2: normal QQ
-- plot 3: scale location
-- plot 4: residuals vs leverage
+### 1. normality - assume residuals are normally distributed 
+- can plot histogram to see distribution
+- can do a Shapiro-Wilk test to check 
+- can check the QQ plot 
 ```{r}
-plot(m1)
+hist(x = residuals(m1),
+     xlab = "Value of residual",
+     main = "",
+     breaks = 20)
 
-which.max(hatvalues(m1)) # which observation has the largest leverage
-# what about 354? is that just an outlier?
+shapiro.test(residuals(m1)) # here we see a significant result, so may be reason to be concerned 
+
+plot(m1, which = 2)
 ```
 
-# multiple linear regression
+
+### 2. linearity
+- can plot fitted values against the observed values 
+- can plot fitted values against the residuals `plot(model, which=1)` - want to see a straight, horizontal line  
+  - `car::residualPlots()` creates a similar plot but for each predictor 
+```{r}
+fit_vals <- fitted.values(m1)
+
+# want this to look linear
+plot(x = fit_vals, y = boston$nox, xlab = "Fitted Values", ylab = "Observed Values") # ...not great
+
+plot(m1, which=1)
+
+residualPlots(m1) # Tukey test comes out significant, suggesting (clear) curvature 
+```
+
+
+### 3. homogeneity of variance - variance of the residuals is assumed to be constant 
+- `plot(model, which=3)` - want to see straight, horizontal line through the middle of the plot
+- `car::ncvTest()` non-constant variance test: looks at the relationship between the fitted values and the variance of the residuals
+- note: if this assumption is violated, the se estimates associated with the regression coefficients are not entirely reliable
+```{r}
+plot(m1, which=3)
+
+ncvTest(m1) # and we see that we have violated yet another assumption
+```
+
+
+### 4. uncorrelated predictors 
+- variance inflation factors (VIFs) can help us determine if predictors in the model are too highly correlated with each other 
+  - high numbers are a sign that there is collinearity
+*not sure I understand what's going on here..*
+```{r}
+# we'll create a second model that has 2 predictors 
+
+m2 <- lm(nox ~ dis + zn, data=boston)
+vif(m2)
+
+m2_interaction <- lm(nox ~ dis * zn, data=boston)
+vif(m2_interaction)
+```
+
+
+### 5. residuals are independent of each other
+
+### 6. no "bad" outliers
+<br>
+![](images/outliers.png)
+<br>
+
+
+## multiple linear regression
 ```{r}
 m2 <- lm(dis ~ ., data=boston) # all predictors
 summary(m2)
@@ -123,7 +177,7 @@ m3 <- lm(dis ~ . - tax - lstat, data=boston) # not sure which variables to remov
 vif(m3) 
 ```
 
-# non linear transformation
+## non linear transformation
 - when transforming predictors so it's ^2, you need to wrap it in `I()` because ^ has a special meaning in a formula 
 - the fact that the transformed predictor (quadratic term) is significant, near 0, suggests it leads to an improved model
 - can do anova() to quantify the extent to which the quadratic fit is superior to the linear fit
