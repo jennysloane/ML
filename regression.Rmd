@@ -133,6 +133,7 @@ residualPlots(m1) # Tukey test comes out significant, suggesting (clear) curvatu
 - `plot(model, which=3)` - want to see straight, horizontal line through the middle of the plot
 - `car::ncvTest()` non-constant variance test: looks at the relationship between the fitted values and the variance of the residuals
 - note: if this assumption is violated, the se estimates associated with the regression coefficients are not entirely reliable
+- robust se so don't have to assume variance is constant
 ```{r}
 plot(m1, which=3)
 
@@ -146,16 +147,21 @@ ncvTest(m1) # and we see that we have violated yet another assumption
 *not sure I understand what's going on here..*
 ```{r}
 # we'll create a second model that has 2 predictors 
-
 m2 <- lm(nox ~ dis + zn, data=boston)
 vif(m2)
 
 m2_interaction <- lm(nox ~ dis * zn, data=boston)
 vif(m2_interaction)
+
+# try centering predictors (for interaction useful to center predictors)
+m2_interaction <- lm(nox ~ scale(dis) * scale(zn), data=boston)
+vif(m2_interaction)
 ```
 
 
 ### 5. residuals are independent of each other
+- error is not systematic 
+- can occur with time series data
 
 ### 6. no "bad" outliers
 <br>
