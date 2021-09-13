@@ -148,7 +148,22 @@ editor_options:
 - parametric approach will also be better when there is a small number of observations per predictor
   
 
+##  Chapter 4: Classification
 
+- logistic regression: approaches for predicting qualitative responses, allows us to solve classification problems
+  - models the probability that Y belongs to a particular category
+- 3 of the mose commonly used classifiers: logistic regression, linear discriminant analysis (LDA), K-nearest neighbors 
+- often deal with binary classification (0 or 1)
+- linear regression model on binary data will not produce a good fit
+- instead, transform linear regression to a logistic regression curve that can only go between 0 and 1
+- Sigmoid aka Logistic function - take any value and output will be only between 0 and 1
+  - Sigmoid function: $$S(x) = \frac{1}{1 + e^{-x}}$$
+  - logistic function: $$p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1X}}$$
+- used least squares approach to estimate the unknown linear regression coefficients
+- for binary responses with 0/1 coding, regression by least squares can work but using linear regression, may get estimates outside of [0,1] interval (see LDA)
+- more common to use maximum likelihood for logistic regressions (least squares is a special case of maximum likelihood)
+- results using one predictor can often be very different and even lead to opposing interpretations when using multiple predictors 
+  - example: "a student is riskier than a non-student if no information about the student's credit card balance is available. However, that student is less risky than a non-student *with the same credit card balance*"
 
 
   

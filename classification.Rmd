@@ -1,0 +1,113 @@
+---
+title: "classification"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Questions before/during reading:
+
+1. maths behind logistic function? 
+
+2. what is log-odds/logit? 
+  - "logistic regression model, increasing X by one unit changes the log odds by $\beta_1$ or equivalently multiplies the odds by $e^{\beta_1}$"
+  - "a one-uni increase in balance is associated withan increase in the log odds of default by 0.0055 units" (p.134)... what does that mean?
+
+3. "The estimated intercept in Table 4.1 is typically not of interest" (p.134)...why?
+
+4. Keen to talk through this example: "a student is riskier than a non-student if no information about the student's credit card balance is available. However, that student is less risky than a non-student *with the same credit card balance*"
+
+# Breast Cancer classification problem
+```{r}
+set.seed(22)
+library(mlbench)
+library(tidyverse)
+library(janitor)
+library(caTools)
+
+data(BreastCancer)
+
+bc_data_raw <- BreastCancer %>%
+  as_tibble() %>%
+  clean_names()
+
+str(bc_data_raw)
+
+sum(is.na(bc_data_raw))
+
+# going to reduce data set down to 4 variables of interest
+bc_data <- bc_data_raw %>%
+  na.omit() %>%
+  select(cl_thickness, cell_size, cell_shape, marg_adhesion, class)
+
+str(bc_data)
+
+# let's reduce the number of factor levels from 10 to 3
+table(bc_data$cl_thickness) 
+table(bc_data$cell_size) 
+table(bc_data$cell_shape) 
+table(bc_data$marg_adhesion) 
+
+bc_data_clean <- bc_data %>%
+  mutate(across(cl_thickness:marg_adhesion, ~ case_when(.x %in% c(1,2,3) ~ "Low", 
+                                   .x %in% c(4,5,6,7) ~ "Medium",
+                                   .x %in% c(8,9,10) ~ "High"))) %>%
+  na.omit()
+
+str(bc_data_clean)
+
+bc_data_clean$cl_thickness <- factor(bc_data_clean$cl_thickness, levels = c("Low", "Medium", "High"))
+bc_data_clean$cell_size <- factor(bc_data_clean$cell_size, levels = c("Low", "Medium", "High"))
+bc_data_clean$cell_shape <- factor(bc_data_clean$cell_shape, levels = c("Low", "Medium", "High"))
+bc_data_clean$marg_adhesion <- factor(bc_data_clean$marg_adhesion, levels = c("Low", "Medium", "High"))
+```
+
+# Data visualisation 
+```{r}
+ggplot(bc_data_clean, aes(cl_thickness)) +
+  geom_bar(aes(fill=class), color="black") +
+  theme_bw()
+
+ggplot(bc_data_clean, aes(cell_size)) +
+  geom_bar(aes(fill=class), color="black") +
+  theme_bw()
+
+ggplot(bc_data_clean, aes(cell_shape)) +
+  geom_bar(aes(fill=class), color="black") +
+  theme_bw()
+
+ggplot(bc_data_clean, aes(marg_adhesion)) +
+  geom_bar(aes(fill=class), color="black") +
+  theme_bw()
+
+
+```
+
+
+# Split into training and testing data
+```{r}
+bc_data_clean$split <- sample.split(bc_data_clean$class, SplitRatio = 0.7)
+
+bc_train <- bc_data_clean %>%
+  filter(split == TRUE)
+
+bc_test <- bc_data_clean %>%
+  filter(split == FALSE)
+
+bc_model <- glm(class ~ ., family = binomial(link = "logit"), data = bc_train)
+summary(bc_model)
+
+bc_test$predicted_class <- predict(bc_model, newdata = bc_test, type = "response") # not sure what this warning is?? 
+
+# confusion matrix
+confusion_mat <- table(bc_test$class, bc_test$predicted_class > 0.5) # compares actual class to predicted class 
+confusion_mat
+
+acc <- (confusion_mat[1,1]+confusion_mat[2,2])/sum(confusion_mat)
+# model is 96% accurate
+```
+
+
+
