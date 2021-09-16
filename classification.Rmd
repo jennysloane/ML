@@ -17,9 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 3. "The estimated intercept in Table 4.1 is typically not of interest" (p.134)...why?
 
-4. Keen to talk through this example: "a student is riskier than a non-student if no information about the student's credit card balance is available. However, that student is less risky than a non-student *with the same credit card balance*"
-
-5. maximum likelihood vs least squares?
+4. maximum likelihood vs least squares?
 
 # Breast Cancer classification problem
 ```{r}
