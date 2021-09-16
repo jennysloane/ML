@@ -376,7 +376,11 @@ pre code {
 <div id="chapter-4-classification" class="section level2">
 <h2>Chapter 4: Classification</h2>
 <ul>
-<li>logistic regression: allows us to solve classification problems</li>
+<li>logistic regression: approaches for predicting qualitative responses, allows us to solve classification problems
+<ul>
+<li>models the probability that Y belongs to a particular category</li>
+</ul></li>
+<li>3 of the mose commonly used classifiers: logistic regression, linear discriminant analysis (LDA), K-nearest neighbors</li>
 <li>often deal with binary classification (0 or 1)</li>
 <li>linear regression model on binary data will not produce a good fit</li>
 <li>instead, transform linear regression to a logistic regression curve that can only go between 0 and 1</li>
@@ -384,6 +388,13 @@ pre code {
 <ul>
 <li>Sigmoid function: <span class="math display">\[S(x) = \frac{1}{1 + e^{-x}}\]</span></li>
 <li>logistic function: <span class="math display">\[p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1X}}\]</span></li>
+</ul></li>
+<li>used least squares approach to estimate the unknown linear regression coefficients</li>
+<li>for binary responses with 0/1 coding, regression by least squares can work but using linear regression, may get estimates outside of [0,1] interval (see LDA)</li>
+<li>more common to use maximum likelihood for logistic regressions (least squares is a special case of maximum likelihood)</li>
+<li>results using one predictor can often be very different and even lead to opposing interpretations when using multiple predictors
+<ul>
+<li>example: “a student is riskier than a non-student if no information about the student’s credit card balance is available. However, that student is less risky than a non-student <em>with the same credit card balance</em>”</li>
 </ul></li>
 </ul>
 </div>
