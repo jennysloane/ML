@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval=FALSE)
 ```
 
 ## Questions before/during reading:
@@ -20,7 +20,6 @@ knitr::opts_chunk$set(echo = TRUE)
 4. maximum likelihood vs least squares?
 
 ```{r}
-set.seed(22)
 library(tidyverse)
 library(mlbench)
 library(tidyverse)
@@ -31,8 +30,152 @@ library(devtools)
 library(MASS)
 library(klaR)
 library(ggord)
+library(GGally)
+library(ggeasy)
 # install_github("fawda123/ggord")
 ```
+
+# simulated data 
+- Question: will students pass or fail?
+- 1 predictor: hours of study
+- Bayes decision boundary (in real life can't calculate the Bayes classifier, but can here because we know the distributions and parameters)
+- LDA
+  - $\pi_{k}$ = prior probability that an observation belongs to *k*th class
+  - $\mu_{k}$ = average of all the training observations from the *k*th class
+  - $\hat\sigma^2$ = weighted average of the sample variances for each of the *K* classes
+```{r}
+set.seed(22)
+
+n = 100
+
+mu_pass = 8.5
+sd_pass = 1
+
+mu_fail = 5
+sd_fail = 1
+
+pass <- rnorm(n, mean=mu_pass, sd=sd_pass) %>%
+  as_tibble() %>%
+  rename(study_hours = value) %>%
+  mutate(pass = 1)
+
+fail <- rnorm(n, mean=mu_fail, sd=sd_fail) %>%
+  as_tibble() %>%
+  rename(study_hours = value) %>%
+  mutate(pass = 0)
+
+df <- rbind(pass, fail) %>%
+  mutate(id = row_number()) %>%
+  relocate(id)
+
+df$pass <- as.factor(df$pass)
+
+# Bayes decision boundary:
+bayes_bound <- (mu_pass+mu_fail)/2
+
+```
+
+## two one dimensional normal density functions 
+- similar to Figure 4.4 left 
+- Bayes decision boundary as the dotted line
+```{r}
+ggplot(df, aes(study_hours, color=pass)) +
+  geom_density() +
+  geom_vline(xintercept = bayes_bound, linetype="dashed") +
+  theme_bw() +
+  labs(x = "Study Hours") 
+```
+
+## 30 observations.. is this just to represent training?
+- similar to Figure 4.4 right
+- again with Bayes decision boundary as dashed line
+```{r}
+# take 30 random observations from both pass and fail classes
+sample30 <- df %>%
+  group_by(pass) %>%
+  sample_n(30)
+
+# estimated decision boundary (LDA?)
+est <- sample30 %>%
+  group_by(pass) %>%
+  summarise(mean = mean(study_hours), 
+            sd = sd(study_hours))
+
+est$pass <- factor(est$pass, labels = c("Fail", "Pass"))
+
+mu_est_pass <- est$mean[est$pass == "Pass"]
+mu_est_fail <- est$mean[est$pass == "Fail"]
+
+est_bound <- (mu_est_pass+mu_est_fail)/2
+
+sample30$pass <- factor(sample30$pass, labels = c("Fail", "Pass"))
+
+ggplot(sample30, aes(study_hours, fill=pass)) +
+  geom_histogram(bins = 15, alpha=.7) +
+  geom_vline(xintercept = bayes_bound, linetype="dashed", size = 1) +
+  geom_vline(xintercept = est_bound, size = 1) + 
+  labs(x = "Study Hours") +
+  theme_bw() +
+  easy_remove_legend_title() +
+  easy_text_size(15) +
+  easy_move_legend("top")
+  
+```
+
+# test new observation
+- picking new observations that weren't used in training, and plugging into equation 4.17 where we assign an observation (x) to the class for which the output of the equation is largest (test for both classes)
+- `high_test_obs` expect larger number to be for "Pass"
+- `low_test_obs` expect larger number to be for "Fail"
+- `mid_test_obs` expect numbers for each classifier to be very close
+```{r}
+train_id <- sample30$id
+
+df %>%
+  arrange(desc(study_hours))
+
+46 %in% train_id # just check that it's not in the training data
+
+high_test_obs <- df %>% # 11.8 study hours
+  filter(id == 46) 
+
+df %>%
+  arrange(study_hours)
+
+low_test_obs <- df %>% # 2.5 study hours
+  filter(id == 115) 
+
+115 %in% train_id
+
+mid_test_obs <- df %>% # near decision boundary
+  filter(id == 154) 
+
+154 %in% train_id
+
+tabyl(sample30$pass)
+est
+
+# set which observation to test 
+test_obs = high_test_obs
+
+# fail 
+x = test_obs$study_hours # new test observation
+pi = .5 # prior probability that an observation belongs to kth class
+mu = est$mean[est$pass == "Fail"] # average of all the training observations from the kth class
+sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
+
+x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+
+# pass
+x = test_obs$study_hours # new test observation
+pi = .5 # prior probability that an observation belongs to kth class
+mu = est$mean[est$pass == "Pass"] # average of all the training observations from the kth class
+sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
+
+x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+
+```
+
+
 
 # LDA with iris data
 [Linear Discriminant Analysis in R | Example with Classification Model & Bi-Plot interpretation](https://www.youtube.com/watch?v=WUCnHx0QDSI)
@@ -42,6 +185,7 @@ library(ggord)
 ```{r}
 set.seed(555)
 
+mydat <- as_tibble(iris)
 pairs.panels(mydat[1:4],
              bg=c("red","yellow","blue")[mydat$Species],
              pch=21)
