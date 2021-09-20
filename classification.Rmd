@@ -44,11 +44,11 @@ library(ggeasy)
   - $\mu_{k}$ = average of all the training observations from the *k*th class
   - $\hat\sigma^2$ = weighted average of the sample variances for each of the *K* classes
 ```{r}
-set.seed(22)
+set.seed(15)
 
 n = 100
 
-mu_pass = 8.5
+mu_pass = 8
 sd_pass = 1
 
 mu_fail = 5
@@ -130,26 +130,21 @@ ggplot(sample30, aes(study_hours, fill=pass)) +
 ```{r}
 train_id <- sample30$id
 
-df %>%
-  arrange(desc(study_hours))
+testing <- df %>%
+  filter(!(id %in% train_id)) %>% # observations that were not part of the training data 
+  arrange(study_hours) %>%
+  mutate(position = row_number())
 
-46 %in% train_id # just check that it's not in the training data
+length_test = testing$position
 
-high_test_obs <- df %>% # 11.8 study hours
-  filter(id == 46) 
+low_test_obs <- testing %>%
+  filter(position == min(length_test)) # study hours = 2.41
 
-df %>%
-  arrange(study_hours)
+mid_test_obs <- testing %>%
+  filter(position == max(length_test)/2) # study hours = 6.47
 
-low_test_obs <- df %>% # 2.5 study hours
-  filter(id == 115) 
-
-115 %in% train_id
-
-mid_test_obs <- df %>% # near decision boundary
-  filter(id == 154) 
-
-154 %in% train_id
+high_test_obs <- testing %>%
+  filter(position == max(length_test)) # study hours = 10.5
 
 tabyl(sample30$pass)
 est
@@ -172,6 +167,44 @@ mu = est$mean[est$pass == "Pass"] # average of all the training observations fro
 sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
 
 x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+
+## create function 
+
+pass_fail_fun <- function(test_data) {
+  
+  # fail 
+  x = test_data$study_hours # new test observation
+  pi = .5 # prior probability that an observation belongs to kth class
+  mu = est$mean[est$pass == "Fail"] # average of all the training observations from the kth class
+  sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
+  
+  lda_class_fail = x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+  
+  # pass
+  x = test_data$study_hours # new test observation
+  pi = .5 # prior probability that an observation belongs to kth class
+  mu = est$mean[est$pass == "Pass"] # average of all the training observations from the kth class
+  sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
+  
+  lda_class_pass = x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+  
+  if(lda_class_fail > lda_class_pass) {
+    output_class = "Fail"
+  } else if(lda_class_pass > lda_class_fail) {
+    output_class = "Pass"
+  } else {
+    output_class = "Undecided" # this probably won't happen
+  }
+  
+  return(list(lda_class_fail, lda_class_pass, output_class))
+  
+}
+
+# list: 
+# 1) lda equation output for FAIL
+# 2) lda equation output for PASS
+# 3) whether the model classifies the observation as "Pass" or "Fail
+pass_fail_fun(test_data = high_test_obs)
 
 ```
 
