@@ -9,15 +9,18 @@ knitr::opts_chunk$set(echo = TRUE, eval=FALSE)
 
 ## Questions before/during reading:
 
-1. maths behind logistic function? 
-
-2. what is log-odds/logit? 
+1. what is log-odds/logit? 
   - "logistic regression model, increasing X by one unit changes the log odds by $\beta_1$ or equivalently multiplies the odds by $e^{\beta_1}$"
   - "a one-uni increase in balance is associated withan increase in the log odds of default by 0.0055 units" (p.134)... what does that mean?
 
-3. "The estimated intercept in Table 4.1 is typically not of interest" (p.134)...why?
+2. "The estimated intercept in Table 4.1 is typically not of interest" (p.134)...why?
 
-4. maximum likelihood vs least squares?
+3. maximum likelihood vs least squares?
+
+4. when to use LDA?
+  - more than 2 classes... can you not do a logistic regression with more than 2 classes?
+
+5. what does an unstable model mean?
 
 ```{r}
 library(tidyverse)
@@ -149,27 +152,6 @@ high_test_obs <- testing %>%
 tabyl(sample30$pass)
 est
 
-# set which observation to test 
-test_obs = high_test_obs
-
-# fail 
-x = test_obs$study_hours # new test observation
-pi = .5 # prior probability that an observation belongs to kth class
-mu = est$mean[est$pass == "Fail"] # average of all the training observations from the kth class
-sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
-
-x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
-
-# pass
-x = test_obs$study_hours # new test observation
-pi = .5 # prior probability that an observation belongs to kth class
-mu = est$mean[est$pass == "Pass"] # average of all the training observations from the kth class
-sigma = est$sd[est$pass == "Fail"]*0.5 + est$sd[est$pass == "Pass"]*0.5
-
-x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
-
-## create function 
-
 pass_fail_fun <- function(test_data) {
   
   # fail 
@@ -204,7 +186,7 @@ pass_fail_fun <- function(test_data) {
 # 1) lda equation output for FAIL
 # 2) lda equation output for PASS
 # 3) whether the model classifies the observation as "Pass" or "Fail
-pass_fail_fun(test_data = high_test_obs)
+pass_fail_fun(test_data = low_test_obs)
 
 ```
 
