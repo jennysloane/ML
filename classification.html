@@ -171,19 +171,24 @@ pre code {
 <div id="questions-beforeduring-reading" class="section level2">
 <h2>Questions before/during reading:</h2>
 <ol style="list-style-type: decimal">
-<li><p>maths behind logistic function?</p></li>
-<li><p>what is log-odds/logit?</p></li>
+<li>what is log-odds/logit?</li>
 </ol>
 <ul>
 <li>“logistic regression model, increasing X by one unit changes the log odds by <span class="math inline">\(\beta_1\)</span> or equivalently multiplies the odds by <span class="math inline">\(e^{\beta_1}\)</span>”</li>
 <li>“a one-uni increase in balance is associated withan increase in the log odds of default by 0.0055 units” (p.134)… what does that mean?</li>
 </ul>
-<ol start="3" style="list-style-type: decimal">
+<ol start="2" style="list-style-type: decimal">
 <li><p>“The estimated intercept in Table 4.1 is typically not of interest” (p.134)…why?</p></li>
 <li><p>maximum likelihood vs least squares?</p></li>
+<li><p>when to use LDA?</p></li>
 </ol>
-<pre class="r"><code>set.seed(22)
-library(tidyverse)
+<ul>
+<li>more than 2 classes… can you not do a logistic regression with more than 2 classes?</li>
+</ul>
+<ol start="5" style="list-style-type: decimal">
+<li>what does an unstable model mean?</li>
+</ol>
+<pre class="r"><code>library(tidyverse)
 library(mlbench)
 library(tidyverse)
 library(janitor)
@@ -194,6 +199,7 @@ library(MASS)
 library(klaR)
 library(ggord)
 library(GGally)
+library(ggeasy)
 # install_github(&quot;fawda123/ggord&quot;)</code></pre>
 </div>
 <div id="simulated-data" class="section level1">
@@ -209,9 +215,11 @@ library(GGally)
 <li><span class="math inline">\(\hat\sigma^2\)</span> = weighted average of the sample variances for each of the <em>K</em> classes</li>
 </ul></li>
 </ul>
-<pre class="r"><code>n = 100
+<pre class="r"><code>set.seed(15)
 
-mu_pass = 8.5
+n = 100
+
+mu_pass = 8
 sd_pass = 1
 
 mu_fail = 5
@@ -227,20 +235,127 @@ fail &lt;- rnorm(n, mean=mu_fail, sd=sd_fail) %&gt;%
   rename(study_hours = value) %&gt;%
   mutate(pass = 0)
 
-df &lt;- rbind(pass, fail)
+df &lt;- rbind(pass, fail) %&gt;%
+  mutate(id = row_number()) %&gt;%
+  relocate(id)
 
 df$pass &lt;- as.factor(df$pass)
 
 # Bayes decision boundary:
-bayes_bound &lt;- (mu_pass+mu_fail)/2
-
-ggplot(df, aes(study_hours, fill=pass)) +
-  geom_histogram(bins = 20) +
+bayes_bound &lt;- (mu_pass+mu_fail)/2</code></pre>
+<div id="two-one-dimensional-normal-density-functions" class="section level2">
+<h2>two one dimensional normal density functions</h2>
+<ul>
+<li>similar to Figure 4.4 left</li>
+<li>Bayes decision boundary as the dotted line</li>
+</ul>
+<pre class="r"><code>ggplot(df, aes(study_hours, color=pass)) +
+  geom_density() +
   geom_vline(xintercept = bayes_bound, linetype=&quot;dashed&quot;) +
   theme_bw() +
-  labs(x = &quot;Study Hours&quot;) 
+  labs(x = &quot;Study Hours&quot;) </code></pre>
+</div>
+<div id="observations..-is-this-just-to-represent-training" class="section level2">
+<h2>30 observations.. is this just to represent training?</h2>
+<ul>
+<li>similar to Figure 4.4 right</li>
+<li>again with Bayes decision boundary as dashed line</li>
+</ul>
+<pre class="r"><code># take 30 random observations from both pass and fail classes
+sample30 &lt;- df %&gt;%
+  group_by(pass) %&gt;%
+  sample_n(30)
 
-# LDA</code></pre>
+# estimated decision boundary (LDA?)
+est &lt;- sample30 %&gt;%
+  group_by(pass) %&gt;%
+  summarise(mean = mean(study_hours), 
+            sd = sd(study_hours))
+
+est$pass &lt;- factor(est$pass, labels = c(&quot;Fail&quot;, &quot;Pass&quot;))
+
+mu_est_pass &lt;- est$mean[est$pass == &quot;Pass&quot;]
+mu_est_fail &lt;- est$mean[est$pass == &quot;Fail&quot;]
+
+est_bound &lt;- (mu_est_pass+mu_est_fail)/2
+
+sample30$pass &lt;- factor(sample30$pass, labels = c(&quot;Fail&quot;, &quot;Pass&quot;))
+
+ggplot(sample30, aes(study_hours, fill=pass)) +
+  geom_histogram(bins = 15, alpha=.7) +
+  geom_vline(xintercept = bayes_bound, linetype=&quot;dashed&quot;, size = 1) +
+  geom_vline(xintercept = est_bound, size = 1) + 
+  labs(x = &quot;Study Hours&quot;) +
+  theme_bw() +
+  easy_remove_legend_title() +
+  easy_text_size(15) +
+  easy_move_legend(&quot;top&quot;)</code></pre>
+</div>
+</div>
+<div id="test-new-observation" class="section level1">
+<h1>test new observation</h1>
+<ul>
+<li>picking new observations that weren’t used in training, and plugging into equation 4.17 where we assign an observation (x) to the class for which the output of the equation is largest (test for both classes)</li>
+<li><code>high_test_obs</code> expect larger number to be for “Pass”</li>
+<li><code>low_test_obs</code> expect larger number to be for “Fail”</li>
+<li><code>mid_test_obs</code> expect numbers for each classifier to be very close</li>
+</ul>
+<pre class="r"><code>train_id &lt;- sample30$id
+
+testing &lt;- df %&gt;%
+  filter(!(id %in% train_id)) %&gt;% # observations that were not part of the training data 
+  arrange(study_hours) %&gt;%
+  mutate(position = row_number())
+
+length_test = testing$position
+
+low_test_obs &lt;- testing %&gt;%
+  filter(position == min(length_test)) # study hours = 2.41
+
+mid_test_obs &lt;- testing %&gt;%
+  filter(position == max(length_test)/2) # study hours = 6.47
+
+high_test_obs &lt;- testing %&gt;%
+  filter(position == max(length_test)) # study hours = 10.5
+
+tabyl(sample30$pass)
+est
+
+pass_fail_fun &lt;- function(test_data) {
+  
+  # fail 
+  x = test_data$study_hours # new test observation
+  pi = .5 # prior probability that an observation belongs to kth class
+  mu = est$mean[est$pass == &quot;Fail&quot;] # average of all the training observations from the kth class
+  sigma = est$sd[est$pass == &quot;Fail&quot;]*0.5 + est$sd[est$pass == &quot;Pass&quot;]*0.5
+  
+  lda_class_fail = x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+  
+  # pass
+  x = test_data$study_hours # new test observation
+  pi = .5 # prior probability that an observation belongs to kth class
+  mu = est$mean[est$pass == &quot;Pass&quot;] # average of all the training observations from the kth class
+  sigma = est$sd[est$pass == &quot;Fail&quot;]*0.5 + est$sd[est$pass == &quot;Pass&quot;]*0.5
+  
+  lda_class_pass = x*(mu/sigma)-(mu^2/(2*sigma)) + log(pi)
+  
+  if(lda_class_fail &gt; lda_class_pass) {
+    output_class = &quot;Fail&quot;
+  } else if(lda_class_pass &gt; lda_class_fail) {
+    output_class = &quot;Pass&quot;
+  } else {
+    output_class = &quot;Undecided&quot; # this probably won&#39;t happen
+  }
+  
+  return(list(lda_class_fail, lda_class_pass, output_class))
+  
+}
+
+# list: 
+# 1) lda equation output for FAIL
+# 2) lda equation output for PASS
+# 3) whether the model classifies the observation as &quot;Pass&quot; or &quot;Fail
+pass_fail_fun(test_data = low_test_obs)</code></pre>
 </div>
 <div id="lda-with-iris-data" class="section level1">
 <h1>LDA with iris data</h1>

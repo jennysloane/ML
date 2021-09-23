@@ -74,6 +74,7 @@ df <- rbind(pass, fail) %>%
 df$pass <- as.factor(df$pass)
 
 # Bayes decision boundary:
+# true because both n = 100 or else have to multiple by priors (weighted)
 bayes_bound <- (mu_pass+mu_fail)/2
 
 ```
