@@ -11,7 +11,7 @@ editor_options:
 
 *Most of these notes are from: An Introduction to Statistical Learning with Applications in R by Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani plus some additional notes from Learning Statistics with R by Danielle Navarro* 
 
-## Chapter 1: Introduction
+# Chapter 1: Introduction
 - **supervised statistical learning** = building a statistical model for predicting or estimating an output based on one or more inputs
 - **unsupervised statistical learning** = there are inputs, but NO outputs. we lack a response variable that can supervise our analysis
 - *semi-supervised learning* = some of the observations have both predictor measurements and a response measurement, but the rest of the observations only have a predictor measurement 
@@ -20,7 +20,7 @@ editor_options:
 - generalized linear models (GLMs) = entire class of statistical learning methods including linear and logistic regression as special cases
 - generalized additive models = class of non-linear extensions to GLMs
 
-## Chapter 2: Statistical Learning
+# Chapter 2: Statistical Learning
 - statistical learning = set of approaches for estimating *f*
 - 2 main reasons to estimate *f*: prediction and inference
 - accuracy of the estimate of *f* depends on reducible and irreducible error
@@ -28,30 +28,30 @@ editor_options:
   - **irreducible error** = there is always some error that will remain ($\epsilon$), no matter how well you estimate *f* 
 - the aim here is to learn about techniques to estimate *f* by minimizing the reducible error 
 
-### parametric methods
+## parametric methods
 - reducing the problem of estimating *f* down to one of estimating a set of parameters 
 - disadvantage: the model we choose will usually not match the true unknown of *f*
 - to try to address this problem, we can choose a more flexible model, but that requires estimating a greater number of parameters and can lead to overfitting (fits errors/noise too closely)
 
-### non-parametric methods
+## non-parametric methods
 - do not make explicit assumptions about the functional form of *f*, but rather estimate *f* get as close to the data points as possible without being too rough or wiggly
 - disadvantage: requires a very large number of observations
 - example: thin-plate spline where you have to specify the level of smoothness
 - tradeoff between flexibility and interpretability 
   - in general, as the flexibility of a method increases, its interpretability decreases 
   
-### regression vs. classification
+## regression vs. classification
 - **regression** = problems with quantitative responses (example: least squares linear regression)
 - **classification** = problems with qualitative responses (example: logistic regression)
 
-### assessing model accuracy
+## assessing model accuracy
 - **mean squared error (MSE)** = most commonly used measure for regression models to evaluate the performance of the statistical model
 - training MSE = computed using training data that that was used to fit the model 
 - but we are really interested in the accuracy of the predictions in test data (previously unseen)
 - we want to choose the method that produces the lowest test MSE 
 - as flexibility of the statistical learning method increases, we see a monotone decrease in the training MSE and a U-shape in the test MSE 
 
-### bias-variance tradeoff
+## bias-variance tradeoff
 - **in order to minimize expected test error, we need a statistical learning method that achieves BOTH low variance and low bias**
 - **variance** = the amount by which estimated *f* would change if we estimated using a different training data set
 - **bias** = error that is introduced by approximating a real-life problem 
@@ -62,7 +62,7 @@ editor_options:
 ![](images/bias_variance.png)
   
   
-##  Chapter 3: Linear Regression  
+#  Chapter 3: Linear Regression  
 - useful tool for predicting a quantitative response
 - linear regressions are "fancier" versions of Pearson correlation...but more powerful
 - y = mx + c
@@ -70,17 +70,17 @@ editor_options:
 - estimated regression coefficients minimize the sum of the squared residuals, also known as "line of best fit"
 - Pearson correlation is equivalent to a linear regression with one predictor
 
-### simple linear regression - a single predictor variable 
+## simple linear regression - a single predictor variable 
 - while the true relationship is usually not known, least squares line can always be computed using the coefficient estimates 
 - **RSE** = considered a measure of the lack of fit of the model to the data
 - **R^2^** = an alternative measure of fit that is the proportion of variance explained and has an interpretional advantage over the RSE
 
-### multiple linear regression - more than 1 predictor
+## multiple linear regression - more than 1 predictor
 - R^2^ will always increase when more variables are added to the model, but if adding a variable to the model only increases R^2^ by a tiny amount, you have more evidence that the variable can be dropped 
 - confidence interval to quantify uncertainty surrounding the average over a large number of cities for example
 - prediction interval to quantify uncertainty surrounding a particular city 
 
-### Other considerations in regression models
+## Other considerations in regression models
 - if a qualitative predictor (factor) has levels, you can create a dummy variable(s) where one category is arbitrarily chosen as the baseline factor and the other variables are compared to it. Can check the p values to see if there's a significant difference between the groups
 - the relationship between the predictors and response are additive and linear
   - additive: the effect of changes in a predictor X on the response Y is independent of the values of the other predictors
@@ -94,7 +94,7 @@ editor_options:
   - example: 'horsepower' and 'horsepower^2^'
   - but this is still a linear model!
 
-### potential problems when fitting a linear regression model
+## potential problems when fitting a linear regression model
   
   - `car` package in R is useful for regression diagnostics 
 
@@ -138,7 +138,7 @@ editor_options:
     - drop one of the problematic variables from the regression
     - combine the collinear variables together into a single predictor (example: `limit` and `rating` are collinear, create a new variable `credit worthiness` that accounts for both)
     
-### Comparison of linear regression with K-nearest neighbors
+## Comparison of linear regression with K-nearest neighbors
 
 - linear regression is an example of a parametric approach because it assumes a linear functional form for f(X)
 - non-parametric methods do not assume a parametric form of f(X) and therefore provide a more flexible approach for performing regression 
@@ -148,7 +148,7 @@ editor_options:
 - parametric approach will also be better when there is a small number of observations per predictor
   
 
-##  Chapter 4: Classification
+#  Chapter 4: Classification
 
 - logistic regression: approaches for predicting qualitative responses, allows us to solve classification problems
   - models the probability that Y belongs to a particular category
@@ -165,8 +165,62 @@ editor_options:
 - results using one predictor can often be very different and even lead to opposing interpretations when using multiple predictors 
   - example: "a student is riskier than a non-student if no information about the student's credit card balance is available. However, that student is less risky than a non-student *with the same credit card balance*"
 
+## LDA 
 
+Why use LDA?
+
+- parameter estimates for the logistic regression model are surprisingly unstable
+- common to use when there are more than two response classes
+
+LDA for p = 1
+
+- assume data is a normal or Gaussian distribution
+- LDA assumes a common variance $\sigma^2$
+- Figure 4.4 left shows the normal density functions for each of the 2 classes
+- the Bayes classifier is drawn as the dotted line where the two distributions intersect
+  - $\frac{\mu_{1} + \mu_{2}}{2}$ 
+- in real life situations, we are not able to calculate the Bayes classifier, so we use the LDA method which approximates the Bayes classifier by plugging in the following parameters:
+  - $\pi_{k}$ = prior probability that an observation belongs to *k*th class
+  - $\mu_{k}$ = average of all the training observations from the *k*th class
+  - $\hat\sigma^2$ = weighted average of the sample variances for each of the *K* classes
+
+- See a walk-through example in `classification.Rmd` 
+- [And here's a helpful YouTube tutorial on LDA and QDA](https://www.youtube.com/watch?v=IMfLXEOksGc)
+  - similar to LDA, but assumes each class has its own covariance matrix
+  - LDA tends to be better if there are relatively few training observations and so reducing variance is crucial
+  - QDA tends to be better if the training set is very large or if the assumption of a common covariance matrix for the classes is clearly not possible
   
+## A Comparison of Classification Methods
+
+Classification methods: logistic regression, LDA, QDA, K-nearest neighbors 
+
+- logistic regression (coefficients estimated with maximum likelihood) and LDA (coefficients estimated using mean and variance from a normal distribution) both produce linear decision boundaries
+  - so, only differ in fitting procedures
+- KNN is completely non-parametric so no assumptions are made about the shape of the decision boundary
+- QDA is kind of like a compromise - quadratic decision boundary but not as flexible as KNN
+
+- When decision boundaries are linear, LDA and logistic regresion approaches will tend to perform better 
+- When decision boundaires are non-linear, QDA may give better results 
+- When decision boundaries are even more complicated, KNN may be best, but KNN does not tell us which predictors are important 
+
+#  Chapter 5: Resampling Methods
+
+- repeatedly drawing samples from a training set and refitting a model of interest on each sample in order to obtain additional information about the fitted model
+- **model assessment** = the process of evaluating a model's performance 
+- **model selection** = the process of selecting the proper level of flexibility 
+- reminder: training error can often be quite different than test error
+
+1. Cross-validation (CV)
+- validation = randomly dividing the available set of observations into 2: training set and validation/hold-out set
+  - conceptually simple and easy to implement
+  - drawbacks: validation estimate of the test error can be highly variable and because only a subset of observations are used to fit the model, validation set error rate may overestimate the test error rate
+- leave-one-out CV
+  - far less bias than validation set approach and tends not to overestimate the test error rate as much
+- k-fold CV
+  - typically k = 5 or k = 10
+- classification when Y is qualitative = use the number of misclassified observations rather than MSE to quantify test error 
+
+2. Bootstrap
+- widely applicable and powerful statistical tool that can be used to quantify the uncertainty associated with a given estimator or statistical learning method
   
-  
-  
+#  Chapter 6: Resampling Methods

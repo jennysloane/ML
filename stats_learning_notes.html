@@ -397,6 +397,32 @@ pre code {
 <li>example: “a student is riskier than a non-student if no information about the student’s credit card balance is available. However, that student is less risky than a non-student <em>with the same credit card balance</em>”</li>
 </ul></li>
 </ul>
+<div id="lda" class="section level3">
+<h3>LDA</h3>
+<p>Why use LDA?</p>
+<ul>
+<li>parameter estimates for the logistic regression model are surprisingly unstable</li>
+<li>common to use when there are more than two response classes</li>
+</ul>
+<p>LDA for p = 1</p>
+<ul>
+<li>assume data is a normal or Gaussian distribution</li>
+<li>LDA assumes a common variance <span class="math inline">\(\sigma^2\)</span></li>
+<li>Figure 4.4 left shows the normal density functions for each of the 2 classes</li>
+<li>the Bayes classifier is drawn as the dotted line where the two distributions intersect
+<ul>
+<li><span class="math inline">\(\frac{\mu_{1} + \mu_{2}}{2}\)</span></li>
+</ul></li>
+<li>in real life situations, we are not able to calculate the Bayes classifier, so we use the LDA method which approximates the Bayes classifier by plugging in the following parameters:
+<ul>
+<li><span class="math inline">\(\pi_{k}\)</span> = prior probability that an observation belongs to <em>k</em>th class</li>
+<li><span class="math inline">\(\mu_{k}\)</span> = average of all the training observations from the <em>k</em>th class</li>
+<li><span class="math inline">\(\hat\sigma^2\)</span> = weighted average of the sample variances for each of the <em>K</em> classes</li>
+</ul></li>
+<li>See a walk-through example in <code>classification.Rmd</code></li>
+<li><a href="https://www.youtube.com/watch?v=IMfLXEOksGc">And here’s a helpful YouTube tutorial on LDA and QDA</a></li>
+</ul>
+</div>
 </div>
 
 
