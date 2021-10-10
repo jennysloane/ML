@@ -223,4 +223,38 @@ Classification methods: logistic regression, LDA, QDA, K-nearest neighbors
 2. Bootstrap
 - widely applicable and powerful statistical tool that can be used to quantify the uncertainty associated with a given estimator or statistical learning method
   
-#  Chapter 6: Resampling Methods
+#  Chapter 6: Linear Model Selection and Regularization 
+- there are alternatives to the least squares fitting method that can improve the simple linear model with better prediction accuracy and model interpretability 
+  - prediction accuracy: if the number of observations is not much larger than the number of variables, least squares can result in a lot of variability and overfit and poor predictions on future test data. Constraining/shrinking the estimated coefficients can reduce variance with negligible increases in bias
+  - model interpretability: there are often "irrelevant" variables that are not associated with the response, so can remove these variables (set corresponding coefficients to 0)
+
+1. Subset Selection
+- Best subset selection 
+  - fit a separate least squares regression for each possible combination of predictors...with too many predictors this is not possible
+  - pick the "best" model - model that has the smallest RSS or largest R^2
+  - but, small RSS/large R^2 indicates low *training* error, but we want a model with low *test* error
+  - select best model using CV predictiton error, Cp, BIC, or adjusted R^2
+- Stepwise selection
+  - explores a far more restricted set of models
+  - forward/backward stepwise selection 
+
+## choosing the optimal model
+  - training set RSS and R^2 cannot be used to select from models with different number of variables
+- to select the best model with respect to test error, need to estimate the test error 
+  - indirectly: make adjustments to teh training error to account for the bias due to overfitting (AIC, BIC, Cp, adjusted //R^2)
+  - directly: use either validation or CV validation approaches. advantage that it is a direct test and makes less assumptions of the true underlying model. can use 1 standard error rule - if models are equally good, best to choose the simpler one
+  
+2. Shrinkage
+- uses all the predictors and constrains/regularizes the coefficient estimates that shrinks the estimates towards 0
+
+## Ride Regression
+- very similar to least squares but coefficients are estimated slightly differently
+- will always include all the predictors, as the "shrinkage penalty" will shrink the coefficients towards 0, but not actually to 0 
+- do not shrink intercept
+- advantage over least squares because of the bias-variance tradeoff
+
+## The Lasso
+
+
+3. Dimension Reduction 
+

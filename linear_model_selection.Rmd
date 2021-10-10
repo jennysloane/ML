@@ -1,0 +1,17 @@
+---
+title: "Linear Model Selection"
+output: html_document
+---
+
+Question:
+
+- what is cross validated prediction error?
+- is best subset selection the better approach when you have a small number of predictors? or should you always use different methods?
+
+- does it matter the order variables are added in or taken out in stepwise selection?
+- subset selection involves 2^p models, but forward stepwise involves 1+p(p+1)/2 models - why this equation?
+- footnote page 209: forward and backward stepwise selection performs a "guided" sear over model space, so effectively considers more models...what does this mean?
+
+- page 211 Figure 6.2 - Cp, BIC, adjusted R^2 all result in a different "best" subset of models... so what do you do? this chapter seemed a little overwhelming in terms of options and methods to use 
+
+- ride regression, do not shrink intercept?
