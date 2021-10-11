@@ -14,4 +14,8 @@ Question:
 
 - page 211 Figure 6.2 - Cp, BIC, adjusted R^2 all result in a different "best" subset of models... so what do you do? this chapter seemed a little overwhelming in terms of options and methods to use 
 
-- ride regression, do not shrink intercept?
+- ridge regression, do not shrink intercept?
+- what is a tuning parameter?
+
+- lasso - figure 6.7 
+- I didn't understand the bayesian interpretation section
