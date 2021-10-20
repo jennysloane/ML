@@ -3,7 +3,10 @@ title: "Linear Model Selection"
 output: html_document
 ---
 
-Question:
+Questions:
+
+- what does regularization mean?
+- if a model is overfit to the training data, does that necessarily mean it will have high variance (inconsistent and probably poor fit to testing data)? 
 
 - what is cross validated prediction error?
 - is best subset selection the better approach when you have a small number of predictors? or should you always use different methods?
@@ -14,8 +17,17 @@ Question:
 
 - page 211 Figure 6.2 - Cp, BIC, adjusted R^2 all result in a different "best" subset of models... so what do you do? this chapter seemed a little overwhelming in terms of options and methods to use 
 
+Ridge vs Lasso
 - ridge regression, do not shrink intercept?
 - what is a tuning parameter?
+- ridge: sum of squared residuals + lamda x either slope^2
+  - can only shrink the slopes/estimates close to 0
+  - will do better when most variables are useful
+- lasso: sum of squared residuals + lamda x either |slope| (all estimated parameters except y intercept)
+  - can shrink slopes/estimates to 0 so can remove some predictors from model
+  - will do better when several "irrelevant" variables
+- how does taking the absolute value allow the slopes to shrink to 0?
 
 - lasso - figure 6.7 
+
 - I didn't understand the bayesian interpretation section

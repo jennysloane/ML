@@ -52,7 +52,8 @@ editor_options:
 - as flexibility of the statistical learning method increases, we see a monotone decrease in the training MSE and a U-shape in the test MSE 
 
 ## bias-variance tradeoff
-![StatQuest Machine Learning Fundamentals: Bias and Variance](https://www.youtube.com/watch?v=EuBBz3bI-aA) <br>
+[StatQuest Machine Learning Fundamentals: Bias and Variance](https://www.youtube.com/watch?v=EuBBz3bI-aA) <br>
+
   - Bias = the inability for a machine learning method (like linear regression) to capture the true relationship is called bias
   - so, a straight line will have a larger bias than a squiggly line that fits each point and the squiggly line will be able to perfectly fit the training set (overfit). However, the straight line will most likely do a much better job fitting the testing set 
   - Variance = the difference in fits between data sets in called variance
@@ -217,7 +218,8 @@ Classification methods: logistic regression, LDA, QDA, K-nearest neighbors
 - reminder: training error can often be quite different than test error
 
 1. Cross-validation (CV)
-![StatQuest Machine Learning: Cross Validation](https://www.youtube.com/watch?v=fSytzGwwBVw)<br>
+[StatQuest Machine Learning: Cross Validation](https://www.youtube.com/watch?v=fSytzGwwBVw)<br>
+
 - validation = randomly dividing the available set of observations into 2: training set and validation/hold-out set
   - conceptually simple and easy to implement
   - drawbacks: validation estimate of the test error can be highly variable and because only a subset of observations are used to fit the model, validation set error rate may overestimate the test error rate
@@ -255,13 +257,14 @@ Classification methods: logistic regression, LDA, QDA, K-nearest neighbors
 - uses all the predictors and constrains/regularizes the coefficient estimates that shrinks the estimates towards 0
 
 ## Ridge Regression
-![StatQuest Regularization Part 1: Ridge Regression](https://www.youtube.com/watch?v=Q81RR3yKn30) <br>
+[StatQuest Regularization Part 1: Ridge Regression](https://www.youtube.com/watch?v=Q81RR3yKn30) <br>
+
 - find a better line/model that may not fit the training set as well by introducing a small amount of bias into how the model fits the training data, but in return for a small amount of bias you get a significant drop in variance (one example of where this may be useful is if your model is overfitting the training data)
 - so, by starting with a slightly worse fit, ridge regression will ultimately provide a better long term predictions 
 - very similar to least squares but coefficients are estimated slightly differently
   - least squares: minimizes the sum of the squared residuals
-  - ridge regression: minimizes the sum of the squared residuals + $\lambda x slope^2 (all squared parameters, excpet y intercept)
-- can try a bunch of values for $\lambda using cross validation to determine which one results in the lowest variance  
+  - ridge regression: minimizes the sum of the squared residuals + $\lambda$ x slope^2 (all squared parameters, excpet y intercept)
+- can try a bunch of values for $\lambda$ using cross validation to determine which one results in the lowest variance  
 - ridge regression works for both continuous and discrete variables
 - even when there isn't enough data to find the least squares estimates, ridge regression can find a solution using cross validation and the penalty
 
@@ -271,8 +274,10 @@ Classification methods: logistic regression, LDA, QDA, K-nearest neighbors
 - tuning parameter - isn't estimated, just sort of guessed, but can use 10-fold cross validation to help find the best value for that tuning parameter
 
 ## The Lasso
+[StatQuest Regularization Part 2: Lasso Regression](https://www.youtube.com/watch?v=NGf0voTMlcs) <br>
+
 - having all the predictors with ridge regression poses a challenge for model interpretation
-- with the lasso, the penalty actually forces some coefficients to shrink to zero when the tuning parameter $\lambda is very large
+- with the lasso, the penalty actually forces some coefficients to shrink to zero when the tuning parameter $\lambda$ is very large
 - this makes the models generated from lasso easier to interpret because it uses only a subset of predictors
 - may expect the lasso to perform better when some predictors can shrink to 0, but ridge regression to perform better when all coefficents are roughly equal size 
 
