@@ -28,6 +28,9 @@ Ridge vs Lasso
   - will do better when several "irrelevant" variables
 - how does taking the absolute value allow the slopes to shrink to 0?
 
+- ridge and lasso regression - regress to the mean
+- tuning parameter adjusts amounts of shrinkage 
 - lasso - figure 6.7 
+- when to use these regressions in practice? 
 
 - I didn't understand the bayesian interpretation section
