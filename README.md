@@ -8,8 +8,4 @@ Here are 2 books that I think are relevant and extremely useful that will also h
   - [An Introduction to Statistical Learning with Applications in R](https://www.statlearning.com/) by Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani 
   - [Learning Statistics with R](https://learningstatisticswithr.com/) by Dani Davarro
 
-Topics covered so far:
-  - Regression Models
-
-
 
